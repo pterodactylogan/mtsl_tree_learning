@@ -2,6 +2,7 @@ from nltk.tree import Tree
 import os
 from nltk.draw.tree import draw_trees
 import argparse
+import json
 
 '''
 Visualizes trees from a file or directory. If no filename is given,
@@ -23,9 +24,9 @@ if __name__ == "__main__":
         if filename[-5:] == ".json" and (file == "" or file == filename):
             name = os.path.join(directory, filename)
             f = open(name, "r")
-            treestrings = f.read().strip("[]").split(",")
+            treestrings = json.loads(f.read())
             for s in treestrings:
-                trees.append(Tree.fromstring(s.strip("\"\n")))
+                trees.append(Tree.fromstring(s))
             f.close()
 
     draw_trees(*trees)

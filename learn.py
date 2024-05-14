@@ -1,5 +1,6 @@
 from nltk.tree import Tree
 import os
+import json
 from mt2slia_utils import *
 
 # TODO: Think about represenations / efficiency
@@ -7,22 +8,23 @@ from mt2slia_utils import *
 path = os.path.dirname(os.path.realpath(__file__))
 
 directory = path + "/trees"
-file = "comp_agreement.json"
+file = "that_trace2.json"
+
+params = {"split_feats": False}
 
 trees = []
 for filename in os.listdir(directory):
-    print(filename)
     if filename[-5:] == ".json" and (file == "" or file == filename):
         name = os.path.join(directory, filename)
         f = open(name, "r")
-        treestrings = f.read().strip("[]").split(",")
+        treestrings = json.loads(f.read())
         for s in treestrings:
-            trees.append(Tree.fromstring(s.strip("\"\n ")))
+            trees.append(Tree.fromstring(s))
         f.close()
 
 bigrams = set()
 for tree in trees:
-    bigrams = bigrams.union(get_bigrams(tree))
+    bigrams = bigrams.union(get_bigrams(tree, params["split_feats"]))
 
 alphabet = set()
 for bigram in bigrams:
@@ -36,14 +38,15 @@ for bigram in bigrams:
 possible_bigrams = set()
 for symb1 in alphabet:
     for symb2 in alphabet:
-        possible_bigrams.add(symb1 + "/" + symb2)
-        possible_bigrams.add(symb1 + "." + symb2)
+        if symb1 != "#>" and symb2 != "<#":
+            possible_bigrams.add(symb1 + "/" + symb2)
+        if symb1 not in ["<#", "#>"] and symb2 not in ["<#", "#>"]:
+            possible_bigrams.add(symb1 + "." + symb2)
 
 unattested = possible_bigrams.difference(bigrams)
 
 constraints = {}
 for bigram in unattested:
-    print(bigram)
     if "/" in bigram:
         symbols = bigram.split("/")
     else:
@@ -53,7 +56,7 @@ for bigram in unattested:
     # find all intervener sets for the bigram
     intervener_sets = set()
     for tree in trees:
-        intervener_sets = intervener_sets.union(get_2paths(bigram, tree))
+        intervener_sets = intervener_sets.union(get_2paths(bigram, tree, params["split_feats"]))
 
     # find the highest cardinality of intervener set
     max_c = 0
@@ -63,9 +66,7 @@ for bigram in unattested:
     for i in range(max_c+1):
         to_add = set()
         for s in intervener_sets:
-            print(s)
             if len(s) == i and len(s.intersection(tier)) == 0:
-                print("adding", s)
                 to_add = to_add.union(s)
         tier = tier.union(to_add)
 
@@ -75,42 +76,37 @@ for bigram in unattested:
     else:
         constraints[tier] = [bigram]
 
-print(constraints)
+for c in constraints:
+    print(c, constraints[c])
+    print()
 
-# TODO: implement tier projection and TSL child string language learning
+test_file = open(path + "/trees/illicit_simple.json")
 
-# test_directory = "./dep-trees-json/autos/01"
-
-# test_trees = []
-# for filename in os.listdir(directory):
-#     if filename[-5:] == ".json":
-#         name = os.path.join(directory, filename)
-#         f = open(name, "r")
-#         treestrings = f.read().strip("[]").split(",")
-#         for s in treestrings:
-#             test_trees.append(Tree.fromstring(s.strip("\" ")))
-#         f.close()
+test_trees = []
+treestrings = json.loads(test_file.read())
+for s in treestrings:
+    test_trees.append(Tree.fromstring(s))
+test_file.close()
 
 
-# obeyed = 0
-# disobeyed = 0
-# for tier in constraints:
-#     for con in constraints[tier]:
-#         intervener_sets = set()
-#         for tree in test_trees:
-#             intervener_sets = intervener_sets.union(get_2paths(bigram, tree))
-#         fine = True
-#         for path in intervener_sets:
-#             if path.intersection(tier) == frozenset():
-#                 fine = False
-#                 break
-#         if fine:
-#             obeyed +=1
-#         else:
-#             disobeyed +=1
+obeyed = 0
+disobeyed = 0
 
-#         if (obeyed+disobeyed)%100 == 0:
-#             print(obeyed, disobeyed)
+for tree in test_trees:
+    violated = False
+    for t in constraints:
+        if violated:
+            break
+        for c in constraints[t]:
+            if violates(tree, c, t, params):
+                disobeyed += 1
+                violated = True
+                break
+
+    if not violated:
+        obeyed += 1
+
+print(obeyed, disobeyed)
             
 
 

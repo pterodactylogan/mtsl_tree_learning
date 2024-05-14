@@ -1,6 +1,29 @@
 from nltk.tree import Tree
 import re
 
+def violates(tree, bigram, tier, params):
+    intervener_sets = get_2paths(bigram, tree, params["split_feats"])
+
+    # the constraint is violated if there are any intervener sets which dont contain a tier element
+    for s in intervener_sets:
+        if len(s.intersection(tier)) == 0:
+            print(intervener_sets)
+            print(tier, bigram,s)
+            return True
+    return False
+
+
+def add_boundaries(tree):
+    result = Tree("<#", [tree])
+    q = [result]
+    while not q == []:
+        node = q.pop(0)
+        for i in range(len(node)):
+            q.append(node[i])
+        if len(node) == 0:
+            node.append("#>")
+    return result
+
 '''
 label: string node label
 returns: list of features represented as strings. The last feature without
@@ -24,13 +47,21 @@ def get_features_MGbank(label):
     return features
 
 '''
-label: string node label
+node: node of tree. This can be a Tree object or a string, since that's
+how nltk trees are structured for god knows what reason.
 returns: list of features represented as strings. The label is simply assumed
 to be "exponent::f1:f2:f3..."
 '''
-def get_features(label):
-    chunks = label.split(":")            
-    return [c for c in chunks if c != ""]
+def get_features(node, split=False):
+    if type(node) == str:
+        label = node
+    else:
+        label = node.label()
+    if split:
+        chunks = label.split(":")            
+        return [c for c in chunks if c != ""]
+    else:
+        return [label]
 
 '''
 tree: input tree with node labels
@@ -39,13 +70,13 @@ the immediate left sibling relation and the second representing immediate domina
 The set contains all possible combinations of features that hold each relation in
 the tree.
 '''
-def get_bigrams(tree):
+def get_bigrams(tree, split_feats=False):
     bigrams = set()
-    root_features = get_features(tree.label())
+    root_features = get_features(tree, split_feats)
     last_child_feats = []
 
     for child in tree:
-        child_feats = get_features(child.label())
+        child_feats = get_features(child, split_feats)
 
         for rfeat in root_features:
             for cfeat in child_feats:
@@ -58,7 +89,8 @@ def get_bigrams(tree):
         last_child_feats = child_feats
 
     for child in tree:
-        bigrams = bigrams.union(get_bigrams(child))
+        if type(child) != str:
+            bigrams = bigrams.union(get_bigrams(child))
 
     return bigrams
 
@@ -86,7 +118,9 @@ tree: the input tree to find interveners in
 returns: set of all intervening symbols (features) between the two addresses
 for the given relation
 '''
-def get_interveners(addr1, addr2, rel, tree):
+def get_interveners(addr1, addr2, rel, tree, split_feats=False):
+    if addr1 == addr2:
+        return None
     interveners = set()
     q = [("", tree)]
     if rel=="sib":
@@ -106,23 +140,29 @@ def get_interveners(addr1, addr2, rel, tree):
         
         while not q==[]:
             address, node = q.pop(0)
+            if node == "#>":
+                continue
             
             # ignore nodes which do not share least common ancestor
             if address[:i] != prefix or address in [prefix, addr1, addr2]:
+                if type(node) == str:
+                    continue
                 for j in range(len(node)):
                     q.append((address + str(j), node[j]))
                 continue
 
             # if ancestor of one of these nodes, it's an intervener
             if addr1[:len(address)] == address:
-                interveners = interveners.union(set(get_features(node.label())))
+                interveners = interveners.union(set(get_features(node, split_feats)))
 
             if addr2[:len(address)] == address:
-                interveners = interveners.union(set(get_features(node.label())))
+                interveners = interveners.union(set(get_features(node, split_feats)))
 
             if preceeds(address, addr2) and preceeds(addr1, address):
-                interveners = interveners.union(set(get_features(node.label())))
+                interveners = interveners.union(set(get_features(node, split_feats)))
                          
+            if type(node) == str:
+                continue
             for j in range(len(node)):
                 q.append((address + str(j), node[j]))
                 
@@ -141,7 +181,7 @@ def get_interveners(addr1, addr2, rel, tree):
 
         for char in addr2[len(addr1):-1]:
             node = node[int(char)]
-            interveners = interveners.union(set(get_features(node.label())))
+            interveners = interveners.union(set(get_features(node, split_feats)))
 
         return frozenset(interveners)
 
@@ -154,7 +194,7 @@ tree: tree to search over
 returns: set of sets, each containing all symbols intervening between a single instance
 of the specified bigram
 '''
-def get_2paths(bigram, tree):
+def get_2paths(bigram, tree, split_feats=False):
     dom = False
     if "/" in bigram:
         dom = True
@@ -169,11 +209,14 @@ def get_2paths(bigram, tree):
     sig1_adds = []
     while not q == []:
         address, node = q.pop(0)
-        feats = get_features(node.label())
+        feats = get_features(node, split_feats)
         if symbols[0] in feats:
             sig0_adds.append(address)
         if symbols[1] in feats:
             sig1_adds.append(address)
+
+        if type(node) == str:
+            continue
 
         for i in range(len(node)):
             q.append((address + str(i), node[i]))

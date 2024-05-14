@@ -1,0 +1,7 @@
+[
+"(C (nom-:D) (that:C (nom-:D) (D) ) ) ",
+"(C:wh+ (nom-:D) (that:C (nom-:D) (wh-:D) ) ) ",
+"(C:wh+ (nom-:D) (C (nom-:D) (wh-:D) ) ) ",
+"(C:wh+ (nom-:D) (C (nom-:wh-:D) (D) ) ) ",
+"(C:wh+ (nom-:D) (C (nom-:D) (C (nom-:D) (wh-:D))))"
+]
