@@ -21,7 +21,7 @@ def simplify(tree, feats):
     label += "::"
     for f in chunks[1].split(":"):
         if f in feats:
-            if label[-2:] == "::":
+            if label[-2:] != "::":
                 label += ":"
             label += f
 
@@ -49,7 +49,7 @@ def simplify(tree, feats):
 '''
 '''
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Draw trees from a file or directory")
+    parser = argparse.ArgumentParser(description="Simplify MG-formatted trees, keeping only the specified features")
     parser.add_argument("MG_file", type=str, default="", help="The file containing list of MG grammar tree strings")
     parser.add_argument("-o", "--outfile", type=str, default = "", help="The file to write simplified trees to")
     parser.add_argument("-f", "--feats", type=str, default = "[]", help="The features to keep in the simplified trees")

@@ -7,8 +7,6 @@ def violates(tree, bigram, tier, params):
     # the constraint is violated if there are any intervener sets which dont contain a tier element
     for s in intervener_sets:
         if len(s.intersection(tier)) == 0:
-            print(intervener_sets)
-            print(tier, bigram,s)
             return True
     return False
 
