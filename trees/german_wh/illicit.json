@@ -1,0 +1,5 @@
+[
+	"(who::T+:C- (::V+:nom+:T- (know::C+:D+:V- (I::D-:nom-)(what::T+:C-:Q (::V+:nom+:T- (believes::C+:D+:V- (the::N+:D-:nom- (journalist::N-))(::T+:C-:wh+ (::V+:nom+:T- (said::C+:D+:V- (the::N+:D-:nom- (politician::N-))(that::T+:C- (::V+:nom+:T- (met::D+:D+:V- (she::D-:nom-)(who::D-:wh-)))))))))) )))",
+	"(what::T+:C- (::V+:nom+:T- (know::C+:D+:V- (I::D-:nom-)(what::T+:C-:Q (::V+:nom+:T- (believes::C+:D+:V- (the::N+:D-:nom- (journalist::N-))(::T+:C-:wh+ (::V+:nom+:T- (said::C+:D+:V- (the::N+:D-:nom- (politician::N-))(that::T+:C- (::V+:nom+:T- (met::D+:D+:V- (she::D-:nom-)(who::D-:wh-)))))))))) )))",
+	"(::T+:C- (::V+:nom+:T- (know::C+:D+:V- (I::D-:nom-)(::T+:C-:wh+:Q (::V+:nom+:T- (believes::C+:D+:V- (the::N+:D-:nom- (journalist::N-))(that::T+:C- (::V+:nom+:T- (said::C+:D+:V- (the::N+:D-:nom- (politician::N-))(what::T+:C- (::V+:nom+:T- (met::D+:D+:V- (she::D-:nom-)(who::D-:wh-)))))))))) )))"
+]
