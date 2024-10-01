@@ -36,7 +36,7 @@ if __name__ == "__main__":
         if "/" in bigram:
             symbols = bigram.split("/")
         else:
-            symbols = bigram.split(".")
+            symbols = bigram.split("_")
         alphabet.add(symbols[0])
         alphabet.add(symbols[1])
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
             if symb1 != "#>" and symb2 != "<#":
                 possible_bigrams.add(symb1 + "/" + symb2)
             if symb1 not in ["<#", "#>"] and symb2 not in ["<#", "#>"]:
-                possible_bigrams.add(symb1 + "." + symb2)
+                possible_bigrams.add(symb1 + "_" + symb2)
 
     unattested = possible_bigrams.difference(bigrams)
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         if "/" in bigram:
             symbols = bigram.split("/")
         else:
-            symbols = bigram.split(".")
+            symbols = bigram.split("_")
         # initialize tier to bigram symbols
         tier = {s for s in symbols}
         # find all intervener sets for the bigram

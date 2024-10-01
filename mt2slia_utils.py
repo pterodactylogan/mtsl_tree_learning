@@ -82,7 +82,7 @@ def get_bigrams(tree, split_feats=False):
 
         for lfeat in last_child_feats:
             for cfeat in child_feats:
-                bigrams.add(lfeat + "." + cfeat)
+                bigrams.add(lfeat + "_" + cfeat)
 
         last_child_feats = child_feats
 
@@ -200,7 +200,7 @@ def get_2paths(bigram, tree, split_feats=False):
     if dom:
         symbols = bigram.split("/")
     else:
-        symbols = bigram.split(".")
+        symbols = bigram.split("_")
 
     q = [("", tree)]
     sig0_adds = []
