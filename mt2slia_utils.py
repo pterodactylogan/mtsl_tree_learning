@@ -63,7 +63,7 @@ def get_features(node, split=False):
 
 '''
 tree: input tree with node labels
-returns: set of bigrams of the form "x.y" or "x/y", with the first representing
+returns: set of bigrams of the form "x_y" or "x/y", with the first representing
 the immediate left sibling relation and the second representing immediate dominance.
 The set contains all possible combinations of features that hold each relation in
 the tree.
@@ -106,6 +106,35 @@ def preceeds(addr1, addr2):
     if int(addr1[i]) < int(addr2[i]):
         return True
     return False
+
+'''
+addr: gorn address of node to find decendants of
+tree: input tree to search over
+returns: set of all symbols (features) which are decendants of the given address
+'''
+def get_decendants(addr, tree, split_feats=False):
+    t = tree
+    for char in addr:
+        t = t[int(char)]
+
+    q = []
+    for child in t:
+        q.append(child)
+
+    interveners = set()
+    while not q == []:
+        node = q.pop(0)
+        if node == "#>":
+            continue
+        if split_feats:
+            feats = get_features(node, split_feats)
+            interveners = interveners.union(set(feats))
+        else:
+            interveners.add(node.label())
+        if type(node) != str:
+            for child in node:
+                q.append(child)
+    return frozenset(interveners)
 
 
 '''
@@ -221,6 +250,9 @@ def get_2paths(bigram, tree, split_feats=False):
 
     intervener_sets = set()
     for addr0 in sig0_adds:
+        if dom and symbols[1] == "#>":
+            intervener_sets.add(get_decendants(addr0, tree, split_feats))
+            continue
         for addr1 in sig1_adds:
             if dom:
                 interveners =get_interveners(addr0,
