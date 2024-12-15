@@ -86,7 +86,7 @@ if __name__ == "__main__":
         print("constraints:", constraints[t])
         print()
 
-    print(len(constraints))
+    print("total constraints:", len(constraints))
 
     test_filename = args.eval_file
 
@@ -103,6 +103,8 @@ if __name__ == "__main__":
     obeyed = 0
     disobeyed = 0
 
+    
+    print("Eval results:")
     for tree in test_trees:
         violated = False
         for t in constraints:
@@ -112,12 +114,14 @@ if __name__ == "__main__":
                 if violates(tree, c, t, params):
                     disobeyed += 1
                     violated = True
+                    print("tier:", set(t))
+                    print("constraint:", c)
+                    print()
                     break
 
         if not violated:
             obeyed += 1
-
-    print("Eval results:")
+            
     print("Banned:", disobeyed)
     print("Permitted:", obeyed)
                 

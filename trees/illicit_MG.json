@@ -1,3 +1,4 @@
 [
-"(did::T+:wh+:C- (::V+:nom+:T- (say::C+:D+:V- (you::D-:nom-) (that::T+:C- (::V+:nom+:T- (saw::D+:D+:V- (who::D-:wh-:nom-) (John::D-) ) ) ) ) ) )"
+"(did::T+:wh+:C- (::V+:nom+:T- (say::C+:D+:V- (you::D-:nom-) (that::T+:C- (::V+:nom+:T- (saw::D+:D+:V- (who::D-:wh-:nom-) (John::D-) ) ) ) ) ) )",
+"(do::T+:wh+:C- (::V+:nom+:T- (believe::C+:D+:V- (you::D-:nom-) (that::T+:C- (::V+:nom+:T- (said::C+:D+:V- (Dave::D-:nom-) (that::T+:C- (::V+:nom+:T- (saw::D+:D+:V- (who::D-:wh-:nom-) (John::D-) ) ) ) ) ) ) ) ) )"
 ]
